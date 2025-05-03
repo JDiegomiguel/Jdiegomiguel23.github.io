@@ -3,116 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administrador</title>
-    <script type="module">
-        // Importar las funciones necesarias desde Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+    <title>Examen de Cultura Digital</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #dd903c;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        main {
+            padding: 20px;
+        }
+        .question {
+            margin-bottom: 15px;
+        }
+        .question label {
+            font-weight: bold;
+        }
+        .question input {
+            margin-right: 10px;
+        }
+        button {
+            background-color: #dd903c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #bf7d2b;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e3f7e3;
+            border: 1px solid #b0e0b3;
+            display: none;
+        }
+        table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #dd903c;
+            color: white;
+        }
+    </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Examen de Cultura Digital</h1>
+    </header>
 
+    <main>
+        <form id="exam-form">
+            <!-- Preguntas del examen -->
+            <div class="question">
+                <label for="q1">1. ¿Qué es un software?</label><br>
+                <input type="radio" name="q1" value="Un conjunto de programas informáticos"> Un conjunto de programas informáticos<br>
+                <input type="radio" name="q1" value="Los componentes físicos de una computadora"> Los componentes físicos de una computadora<br>
+                <input type="radio" name="q1" value="El almacenamiento de datos"> El almacenamiento de datos<br>
+            </div>
+            <div class="question">
+                <label for="q2">2. ¿Qué es el hardware?</label><br>
+                <input type="radio" name="q2" value="Un conjunto de programas informáticos"> Un conjunto de programas informáticos<br>
+                <input type="radio" name="q2" value="Los componentes físicos de una computadora"> Los componentes físicos de una computadora<br>
+                <input type="radio" name="q2" value="Un sistema operativo"> Un sistema operativo<br>
+            </div>
+            <div class="question">
+                <label for="q3">3. ¿Qué es el almacenamiento en la nube?</label><br>
+                <input type="radio" name="q3" value="Almacenamiento y servicios en línea accesibles desde cualquier dispositivo conectado a internet"> Almacenamiento y servicios en línea accesibles desde cualquier dispositivo conectado a internet<br>
+                <input type="radio" name="q3" value="Almacenamiento físico dentro de una computadora"> Almacenamiento físico dentro de una computadora<br>
+                <input type="radio" name="q3" value="La creación de redes de computadoras"> La creación de redes de computadoras<br>
+            </div>
+            <div class="question">
+                <label for="q4">4. ¿Qué es un virus informático?</label><br>
+                <input type="radio" name="q4" value="Un programa que se ejecuta sin el conocimiento del usuario y puede dañar o robar información"> Un programa que se ejecuta sin el conocimiento del usuario y puede dañar o robar información<br>
+                <input type="radio" name="q4" value="Un software para almacenar información"> Un software para almacenar información<br>
+                <input type="radio" name="q4" value="Un tipo de malware"> Un tipo de malware<br>
+            </div>
+            <div class="question">
+                <label for="q5">5. ¿Qué es el firewall?</label><br>
+                <input type="radio" name="q5" value="Un sistema de protección contra virus y accesos no autorizados a la red"> Un sistema de protección contra virus y accesos no autorizados a la red<br>
+                <input type="radio" name="q5" value="Un programa antivirus"> Un programa antivirus<br>
+                <input type="radio" name="q5" value="Un tipo de hardware"> Un tipo de hardware<br>
+            </div>
+            <!-- Continuar con las demás preguntas hasta la 30 -->
+
+            <button type="submit">Enviar Respuestas</button>
+        </form>
+        
+        <div id="result" class="result">
+            <h2>Resultado:</h2>
+            <p id="score"></p>
+        </div>
+        
+        <h2>Panel de Administración</h2>
+        <table id="exam-table">
+            <thead>
+                <tr>
+                    <th>Nombre del Estudiante</th>
+                    <th>Resultado</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </main>
+
+    <script>
         // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCKSGF4Sny9K_-zC7dl96o1eOhmw2nvrpE",
             authDomain: "examen-c2601.firebaseapp.com",
             databaseURL: "https://examen-c2601-default-rtdb.firebaseio.com",
             projectId: "examen-c2601",
-            storageBucket: "examen-c2601.appspot.com",
+            storageBucket: "examen-c2601.firebasestorage.app",
             messagingSenderId: "183710876262",
             appId: "1:183710876262:web:94e1a10c774413e5f0a3a7"
         };
 
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-        // Función para cargar los exámenes enviados
-        function cargarExamenes() {
-            const exámenesRef = ref(db, 'examenes');
-            get(exámenesRef)
-                .then((snapshot) => {
-                    if (snapshot.exists()) {
-                        const examenes = snapshot.val();
-                        mostrarExamenes(examenes);
-                    } else {
-                        console.log("No hay exámenes disponibles.");
+        const form = document.getElementById('exam-form');
+        const resultDiv = document.getElementById('result');
+        const scoreText = document.getElementById('score');
+        const examTable = document.getElementById('exam-table').getElementsByTagName('tbody')[0];
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let score = 0;
+            const answers = {
+                q1: 'Un conjunto de programas informáticos',
+                q2: 'Los componentes físicos de una computadora',
+                q3: 'Almacenamiento y servicios en línea accesibles desde cualquier dispositivo conectado a internet',
+                q4: 'Un programa que se ejecuta sin el conocimiento del usuario y puede dañar o robar información',
+                q5: 'Un sistema de protección contra virus y accesos no autorizados a la red',
+                // Continuar con las demás respuestas
+            };
+
+            // Guardar respuestas del usuario en el objeto
+            let userAnswers = {};
+            let correctAnswers = 0;
+
+            for (let [question, correctAnswer] of Object.entries(answers)) {
+                const selectedOption = form.querySelector(`input[name="${question}"]:checked`);
+                if (selectedOption) {
+                    const answer = selectedOption.value;
+                    userAnswers[question] = answer;
+
+                    if (answer === correctAnswer) {
+                        correctAnswers++;
                     }
-                })
-                .catch((error) => {
-                    console.error("Error al obtener los datos: ", error);
-                });
-        }
-
-        // Función para mostrar los exámenes en el panel
-        function mostrarExamenes(examenes) {
-            const panel = document.getElementById("panel");
-            panel.innerHTML = ''; // Limpiar el panel antes de agregar los nuevos exámenes
-
-            // Iterar sobre cada examen y mostrarlo
-            for (const key in examenes) {
-                if (examenes.hasOwnProperty(key)) {
-                    const examen = examenes[key];
-                    const div = document.createElement("div");
-                    div.className = "examen";
-                    div.innerHTML = `
-                        <div class="examen-card">
-                            <h3>Examen de: ${examen.nombre}</h3>
-                            <p><strong>Hora de envío:</strong> ${examen.hora}</p>
-                            <p><strong>Respuestas:</strong></p>
-                            <pre>${JSON.stringify(examen.respuestas, null, 2)}</pre>
-                        </div>
-                    `;
-                    panel.appendChild(div);
                 }
             }
-        }
 
-        // Cargar los exámenes cuando se cargue la página
-        window.onload = cargarExamenes;
+            // Enviar respuestas y resultado a Firebase
+            const userId = new Date().getTime(); // Usamos un identificador único basado en la fecha y hora
+            firebase.database().ref('exams/' + userId).set({
+                answers: userAnswers,
+                score: correctAnswers,
+                totalQuestions: 30
+            }).then(() => {
+                resultDiv.style.display = 'block';
+                scoreText.textContent = `Tu puntuación es: ${correctAnswers} de 30.`;
+            });
+        });
+
+        // Obtener resultados en el panel de administración
+        firebase.database().ref('exams').on('value', function(snapshot) {
+            const data = snapshot.val();
+            examTable.innerHTML = ''; // Limpiar la tabla antes de agregar nuevos datos
+
+            for (const key in data) {
+                const row = examTable.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+
+                cell1.textContent = `Estudiante ${key}`;
+                cell2.textContent = `${data[key].score} de ${data[key].totalQuestions}`;
+            }
+        });
     </script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #dd903c;
-            padding: 20px;
-            color: white;
-            text-align: center;
-        }
-        .examen-card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin: 20px;
-            padding: 15px;
-        }
-        .examen-card h3 {
-            color: #dd903c;
-        }
-        .examen-card pre {
-            background-color: #f0f0f0;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .examen-card p {
-            color: #333;
-        }
-        #panel {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 10px;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>Panel de Administración de Exámenes</h1>
-    </header>
-
-    <div id="panel">
-        <!-- Aquí se mostrarán los exámenes -->
-    </div>
 </body>
 </html>
