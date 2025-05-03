@@ -1,170 +1,163 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Examen de Cultura Digital</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #fff;
+      background-color: #ffffff;
+      font-family: Arial, sans-serif;
       color: #333;
-      padding: 30px;
-    }
-    h2 {
-      color: #dd903c;
-      text-align: center;
-    }
-    .pregunta {
-      margin-bottom: 25px;
       padding: 20px;
-      border: 2px solid #dd903c;
+    }
+
+    h1 {
+      text-align: center;
+      color: #dd903c;
+    }
+
+    .pregunta {
+      border: 1px solid #ddd;
       border-radius: 10px;
-      background: #fdfdfd;
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: #fdf7f1;
     }
-    .opcion {
-      margin-top: 8px;
-    }
+
     button {
       background-color: #dd903c;
       color: white;
       border: none;
-      padding: 12px 20px;
-      border-radius: 5px;
+      padding: 10px 20px;
+      border-radius: 8px;
       font-size: 16px;
       cursor: pointer;
-      margin-top: 20px;
+      display: block;
+      margin: 20px auto;
     }
-    button:hover {
-      background-color: #c47127;
-    }
-    .notificacion {
-      display: none;
-      background-color: #28a745;
-      color: white;
-      padding: 15px;
-      margin-top: 20px;
-      border-radius: 10px;
+
+    #notificacion {
       text-align: center;
+      font-weight: bold;
+      color: green;
+      margin-top: 15px;
     }
   </style>
 </head>
 <body>
-  <h2>Examen de Cultura Digital</h2>
-  <form id="formulario"></form>
-  <button onclick="enviarRespuestas()">Enviar Examen</button>
+  <h1>Examen de Cultura Digital</h1>
+  <div id="preguntas"></div>
+  <button onclick="enviarExamen()">Enviar Examen</button>
+  <div id="notificacion"></div>
 
-  <!-- Notificación de Examen Enviado -->
-  <div id="notificacion" class="notificacion">
-    ¡Examen Enviado Exitosamente!
-  </div>
-
-  <!-- Parte 2: Firebase y lógica -->
+  <!-- Firebase y lógica -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCKSGF4Sny9K_-zC7dl96o1eOhmw2nvrpE",
       authDomain: "examen-c2601.firebaseapp.com",
       databaseURL: "https://examen-c2601-default-rtdb.firebaseio.com",
       projectId: "examen-c2601",
-      storageBucket: "examen-c2601.firebasestorage.app",
+      storageBucket: "examen-c2601.appspot.com",
       messagingSenderId: "183710876262",
       appId: "1:183710876262:web:94e1a10c774413e5f0a3a7"
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = getDatabase(app);
 
-    const preguntasBanco = [
-      { pregunta: "¿Qué es la cultura digital?", opciones: ["Uso de computadoras", "Interacción digital en la sociedad", "Solo redes sociales", "Solo Internet"], respuesta: "Interacción digital en la sociedad" },
-      { pregunta: "¿Qué es un software?", opciones: ["Parte física de la computadora", "Programas y aplicaciones", "Pantalla", "Cable USB"], respuesta: "Programas y aplicaciones" },
-      { pregunta: "¿Qué es hardware?", opciones: ["Sistema operativo", "Word", "Parte física del equipo", "Nube"], respuesta: "Parte física del equipo" },
-      { pregunta: "¿Qué es la web?", opciones: ["Una red social", "Conjunto de documentos y recursos interconectados", "Un dispositivo", "Un tipo de software"], respuesta: "Conjunto de documentos y recursos interconectados" },
-      { pregunta: "¿Qué es un servidor?", opciones: ["Una computadora que almacena archivos", "Un programa de diseño gráfico", "Una red de computadoras", "Un tipo de cable"], respuesta: "Una computadora que almacena archivos" },
-      { pregunta: "¿Qué es el Internet?", opciones: ["Un software", "Una red mundial de computadoras", "Un sistema operativo", "Un tipo de dispositivo"], respuesta: "Una red mundial de computadoras" },
-      { pregunta: "¿Qué es un virus informático?", opciones: ["Un hardware dañado", "Un programa que se reproduce sin control", "Un tipo de conexión", "Un servicio de Internet"], respuesta: "Un programa que se reproduce sin control" },
-      { pregunta: "¿Qué significa URL?", opciones: ["Un servicio de Internet", "Uniform Resource Locator", "Un programa informático", "Un tipo de software"], respuesta: "Uniform Resource Locator" },
-      { pregunta: "¿Qué es la nube?", opciones: ["Un servicio de almacenamiento en línea", "Un dispositivo", "Un tipo de red", "Un virus informático"], respuesta: "Un servicio de almacenamiento en línea" },
-      { pregunta: "¿Qué es el software libre?", opciones: ["Software pago", "Software con licencia abierta para modificarlo", "Software cerrado", "Software de código propietario"], respuesta: "Software con licencia abierta para modificarlo" },
-      { pregunta: "¿Qué es un navegador?", opciones: ["Un software para navegar por Internet", "Un servicio de almacenamiento", "Un tipo de red", "Un tipo de hardware"], respuesta: "Un software para navegar por Internet" },
-      { pregunta: "¿Qué es un sistema operativo?", opciones: ["Un hardware", "Un programa que gestiona los recursos de una computadora", "Una red de computadoras", "Un servicio de Internet"], respuesta: "Un programa que gestiona los recursos de una computadora" },
-      { pregunta: "¿Qué es la ciberseguridad?", opciones: ["Protección de datos en la red", "Un virus informático", "Un sistema operativo", "Un tipo de hardware"], respuesta: "Protección de datos en la red" },
-      { pregunta: "¿Qué es el Big Data?", opciones: ["Conjunto de datos pequeños", "Conjunto de datos masivos que se pueden analizar", "Un tipo de dispositivo", "Una red social"], respuesta: "Conjunto de datos masivos que se pueden analizar" },
-      { pregunta: "¿Qué es la inteligencia artificial?", opciones: ["Una red de computadoras", "Una disciplina que crea sistemas inteligentes", "Un servicio de almacenamiento", "Un software",], respuesta: "Una disciplina que crea sistemas inteligentes" }
+    const preguntas = [
+      { texto: "1. ¿Qué es la cultura digital?", opciones: ["Conjunto de conocimientos digitales", "Lenguaje informal", "Solo redes sociales", "Una tribu tecnológica"] },
+      { texto: "2. ¿Cuál es un ejemplo de herramienta digital?", opciones: ["Internet", "Lápiz", "Papel", "Pizarra"] },
+      { texto: "3. ¿Qué significa ser un ciudadano digital responsable?", opciones: ["Usar internet con ética", "Hackear páginas", "Usar redes sin pensar", "Evitar contraseñas"] },
+      { texto: "4. ¿Qué es una red social?", opciones: ["Plataforma para interactuar", "Página de compras", "Enciclopedia", "Programa de TV"] },
+      { texto: "5. ¿Cuál es una buena práctica de seguridad digital?", opciones: ["Usar contraseñas seguras", "Compartir datos", "Abrir correos sospechosos", "Conectarse a WiFi desconocido"] },
+      { texto: "6. ¿Qué es la huella digital?", opciones: ["Rastro que dejas en internet", "Marca de un dedo", "Firma digitalizada", "Nombre de usuario"] },
+      { texto: "7. ¿Qué es el software?", opciones: ["Programas de computadora", "Partes físicas", "Cable de red", "Memoria RAM"] },
+      { texto: "8. ¿Qué es el hardware?", opciones: ["Partes físicas de un equipo", "Programas del sistema", "Base de datos", "Redes sociales"] },
+      { texto: "9. ¿Cuál es una forma de comunicarse digitalmente?", opciones: ["Correo electrónico", "Cartas postales", "Teléfono fijo", "Pintura rupestre"] },
+      { texto: "10. ¿Qué es el phishing?", opciones: ["Engaño para obtener datos", "Navegador web", "Software de seguridad", "Tipo de red"] },
+      { texto: "11. ¿Qué es una URL?", opciones: ["Dirección de una página web", "Lenguaje de programación", "Antivirus", "Base de datos"] },
+      { texto: "12. ¿Qué es una VPN?", opciones: ["Red privada virtual", "Programa de dibujo", "Antivirus", "Red social"] },
+      { texto: "13. ¿Qué se necesita para conectarse a internet?", opciones: ["Módem y proveedor", "Microscopio", "TV", "CD-ROM"] },
+      { texto: "14. ¿Qué es un navegador web?", opciones: ["Programa para ver páginas web", "Base de datos", "Sistema operativo", "Antena"] },
+      { texto: "15. ¿Qué es la nube?", opciones: ["Almacenamiento en internet", "El cielo", "Disco duro", "Correo"] },
+      { texto: "16. ¿Qué es una contraseña segura?", opciones: ["Mezcla de letras, números y símbolos", "1234", "tu nombre", "abc"] },
+      { texto: "17. ¿Qué es el ciberacoso?", opciones: ["Acoso en internet", "Ayuda digital", "Corrección en línea", "Hackeo ético"] },
+      { texto: "18. ¿Qué es un archivo PDF?", opciones: ["Formato de documento", "Foto", "Video", "Página web"] },
+      { texto: "19. ¿Qué es un antivirus?", opciones: ["Programa que detecta amenazas", "Virus de computadora", "PDF seguro", "Red interna"] },
+      { texto: "20. ¿Qué es una IP?", opciones: ["Identificador de una red", "Correo electrónico", "Navegador", "Nombre de usuario"] },
+      { texto: "21. ¿Cuál es el propósito de un sistema operativo?", opciones: ["Gestionar hardware y software", "Enviar correos", "Dibujar", "Tomar fotos"] },
+      { texto: "22. ¿Qué es un archivo comprimido?", opciones: ["Archivo con menos tamaño", "PDF", "Virus", "Foto"] },
+      { texto: "23. ¿Qué significa streaming?", opciones: ["Ver contenido en línea", "Descargar", "Chatear", "Comprimir"] },
+      { texto: "24. ¿Qué es un dominio web?", opciones: ["Nombre de una página", "Red local", "Software", "VPN"] },
+      { texto: "25. ¿Qué significa CC en un correo?", opciones: ["Copia para otro destinatario", "Carpeta compartida", "Correo cancelado", "Copia de CD"] },
+      { texto: "26. ¿Qué es un código QR?", opciones: ["Código escaneable", "Virus", "Correo", "Sitio web"] },
+      { texto: "27. ¿Qué es un blog?", opciones: ["Sitio para publicar textos", "Juego", "Red social", "Antivirus"] },
+      { texto: "28. ¿Qué es la netiqueta?", opciones: ["Normas de comportamiento digital", "Idioma de red", "Usuario falso", "Antivirus"] },
+      { texto: "29. ¿Qué es un foro digital?", opciones: ["Espacio para debatir en línea", "Tienda", "Red física", "Correo"] },
+      { texto: "30. ¿Qué es una actualización de software?", opciones: ["Mejoras al programa", "Virus", "Borrado", "Desinstalación"] }
     ];
 
-    const alumno = localStorage.getItem("alumnoNombre") || "Desconocido";
-    const formulario = document.getElementById("formulario");
+    window.onload = () => {
+      let nombre = sessionStorage.getItem("nombre");
+      if (!nombre) {
+        nombre = prompt("Ingresa tu nombre:");
+        if (!nombre) {
+          alert("Debes ingresar un nombre.");
+          location.reload();
+        }
+        sessionStorage.setItem("nombre", nombre);
+      }
 
-    let preguntasSeleccionadas = [];
-    let tiempoInicio = Date.now();
-    let puntaje = 0;
-
-    function cargarPreguntas() {
-      preguntasSeleccionadas = preguntasBanco.sort(() => 0.5 - Math.random()).slice(0, 15);
-      mostrarPreguntas();
-    }
-
-    function mostrarPreguntas() {
-      formulario.innerHTML = ""; // Limpiamos el formulario
-
-      // Mostramos todas las preguntas
-      preguntasSeleccionadas.forEach((p, index) => {
+      const contenedor = document.getElementById("preguntas");
+      preguntas.forEach((pregunta, index) => {
         const div = document.createElement("div");
         div.className = "pregunta";
-        div.innerHTML = `<strong>${index + 1}. ${p.pregunta}</strong><br>` +
-          p.opciones.map(op =>
-            `<div class="opcion">
-              <input type="radio" name="p${index}" value="${op}" required>
-              <label>${op}</label>
-            </div>`).join("");
-        formulario.appendChild(div);
+        div.innerHTML = `
+          <p><strong>${pregunta.texto}</strong></p>
+          ${pregunta.opciones.map(
+            (op, i) => `
+              <label>
+                <input type="radio" name="p${index}" value="${op}" />
+                ${String.fromCharCode(65 + i)}) ${op}
+              </label><br>`
+          ).join("")}
+        `;
+        contenedor.appendChild(div);
       });
-    }
+    };
 
-    async function enviarRespuestas() {
-      const tiempoFin = Date.now();
-      const tiempoTotal = Math.floor((tiempoFin - tiempoInicio) / 1000);
-      const respuestas = [];
-      puntaje = 0; // Reiniciamos el puntaje
+    window.enviarExamen = function () {
+      const nombre = sessionStorage.getItem("nombre");
+      const respuestas = {};
+      const preguntas = document.querySelectorAll(".pregunta");
 
-      // Verificamos las respuestas del alumno
-      for (let i = 0; i < preguntasSeleccionadas.length; i++) {
-        const seleccion = document.querySelector(`input[name="p${i}"]:checked`);
-        const respuestaAlumno = seleccion ? seleccion.value : "Sin respuesta";
+      preguntas.forEach((preguntaDiv, i) => {
+        const seleccionada = preguntaDiv.querySelector("input[type='radio']:checked");
+        respuestas[`pregunta_${i + 1}`] = seleccionada ? seleccionada.value : "Sin respuesta";
+      });
 
-        if (respuestaAlumno === preguntasSeleccionadas[i].respuesta) {
-          puntaje++; // Aumentamos el puntaje si la respuesta es correcta
-        }
+      const datos = {
+        nombre,
+        hora: new Date().toLocaleTimeString(),
+        respuestas
+      };
 
-        respuestas.push({
-          pregunta: preguntasSeleccionadas[i].pregunta,
-          respuesta: respuestaAlumno
+      const timestamp = Date.now();
+      set(ref(db, `examenes/${nombre}_${timestamp}`), datos)
+        .then(() => {
+          document.getElementById("notificacion").textContent = "✅ Examen enviado correctamente.";
+          document.querySelector("button").disabled = true;
+        })
+        .catch((error) => {
+          document.getElementById("notificacion").textContent = "❌ Error al enviar: " + error.message;
         });
-      }
-
-      try {
-        // Guardamos los datos en Firestore
-        await addDoc(collection(db, "resultados"), {
-          alumno,
-          respuestas,
-          tiempo: tiempoTotal,
-          puntaje,
-          fecha: serverTimestamp()
-        });
-        // Mostramos la notificación de éxito
-        document.getElementById("notificacion").style.display = "block";
-        setTimeout(() => {
-          location.href = "index.html"; // Redirigimos a la página de inicio después de un momento
-        }, 2000);
-      } catch (error) {
-        alert("Error al guardar respuestas.");
-        console.error(error);
-      }
-    }
-
-    cargarPreguntas(); // Cargamos las preguntas cuando la página se carga
+    };
   </script>
 </body>
 </html>
+
