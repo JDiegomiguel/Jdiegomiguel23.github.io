@@ -3,94 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración - Examen de Cultura Digital</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #dd903c;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
-        main {
-            padding: 20px;
-        }
-        table {
-            width: 100%;
-            margin: 20px 0;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #dd903c;
-            color: white;
-        }
-    </style>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js"></script>
-</head>
-<body>
-    <header>
-        <h1>Panel de Administración - Examen de Cultura Digital</h1>
-    </header>
+    <title>Panel de Administrador</title>
+    <script type="module">
+        // Importar las funciones necesarias desde Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-    <main>
-        <h2>Resultados de los Estudiantes</h2>
-        <table id="exam-table">
-            <thead>
-                <tr>
-                    <th>Nombre del Estudiante</th>
-                    <th>Resultado</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </main>
-
-    <script>
         // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCKSGF4Sny9K_-zC7dl96o1eOhmw2nvrpE",
             authDomain: "examen-c2601.firebaseapp.com",
             databaseURL: "https://examen-c2601-default-rtdb.firebaseio.com",
             projectId: "examen-c2601",
-            storageBucket: "examen-c2601.firebasestorage.app",
+            storageBucket: "examen-c2601.appspot.com",
             messagingSenderId: "183710876262",
             appId: "1:183710876262:web:94e1a10c774413e5f0a3a7"
         };
 
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-        const examTable = document.getElementById('exam-table').getElementsByTagName('tbody')[0];
+        // Función para cargar los exámenes enviados
+        function cargarExamenes() {
+            const exámenesRef = ref(db, 'examenes');
+            get(exámenesRef)
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const examenes = snapshot.val();
+                        mostrarExamenes(examenes);
+                    } else {
+                        console.log("No hay exámenes disponibles.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error al obtener los datos: ", error);
+                });
+        }
 
-        // Obtener resultados en el panel de administración
-        firebase.database().ref('exams').on('value', function(snapshot) {
-            const data = snapshot.val();
-            examTable.innerHTML = ''; // Limpiar la tabla antes de agregar nuevos datos
+        // Función para mostrar los exámenes en el panel
+        function mostrarExamenes(examenes) {
+            const panel = document.getElementById("panel");
+            panel.innerHTML = ''; // Limpiar el panel antes de agregar los nuevos exámenes
 
-            for (const key in data) {
-                const row = examTable.insertRow();
-                const cell1 = row.insertCell(0);
-                const cell2 = row.insertCell(1);
-
-                cell1.textContent = `Estudiante ${key}`;
-                cell2.textContent = `${data[key].score} de ${data[key].totalQuestions}`;
+            // Iterar sobre cada examen y mostrarlo
+            for (const key in examenes) {
+                if (examenes.hasOwnProperty(key)) {
+                    const examen = examenes[key];
+                    const div = document.createElement("div");
+                    div.className = "examen";
+                    div.innerHTML = `
+                        <div class="examen-card">
+                            <h3>Examen de: ${examen.nombre}</h3>
+                            <p><strong>Hora de envío:</strong> ${examen.hora}</p>
+                            <p><strong>Respuestas:</strong></p>
+                            <pre>${JSON.stringify(examen.respuestas, null, 2)}</pre>
+                        </div>
+                    `;
+                    panel.appendChild(div);
+                }
             }
-        });
+        }
+
+        // Cargar los exámenes cuando se cargue la página
+        window.onload = cargarExamenes;
     </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #dd903c;
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+        .examen-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            padding: 15px;
+        }
+        .examen-card h3 {
+            color: #dd903c;
+        }
+        .examen-card pre {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .examen-card p {
+            color: #333;
+        }
+        #panel {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Panel de Administración de Exámenes</h1>
+    </header>
+
+    <div id="panel">
+        <!-- Aquí se mostrarán los exámenes -->
+    </div>
 </body>
 </html>
