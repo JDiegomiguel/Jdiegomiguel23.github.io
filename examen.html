@@ -1,163 +1,209 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Examen de Cultura Digital</title>
-  <style>
-    body {
-      background-color: #ffffff;
-      font-family: Arial, sans-serif;
-      color: #333;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      color: #dd903c;
-    }
-
-    .pregunta {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      margin-bottom: 15px;
-      padding: 10px;
-      background-color: #fdf7f1;
-    }
-
-    button {
-      background-color: #dd903c;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      display: block;
-      margin: 20px auto;
-    }
-
-    #notificacion {
-      text-align: center;
-      font-weight: bold;
-      color: green;
-      margin-top: 15px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Cultura Digital</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #dd903c;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        main {
+            padding: 20px;
+        }
+        .question {
+            margin-bottom: 15px;
+        }
+        .question label {
+            font-weight: bold;
+        }
+        .question input {
+            margin-right: 10px;
+        }
+        button {
+            background-color: #dd903c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #bf7d2b;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e3f7e3;
+            border: 1px solid #b0e0b3;
+            display: none;
+        }
+    </style>
 </head>
 <body>
-  <h1>Examen de Cultura Digital</h1>
-  <div id="preguntas"></div>
-  <button onclick="enviarExamen()">Enviar Examen</button>
-  <div id="notificacion"></div>
+    <header>
+        <h1>Examen de Cultura Digital</h1>
+    </header>
 
-  <!-- Firebase y lógica -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+    <main>
+        <form id="exam-form">
+            <!-- Pregunta 1 -->
+            <div class="question">
+                <label for="q1">1. ¿Qué es el software?</label><br>
+                <input type="radio" id="q1a" name="q1" value="Un conjunto de programas informáticos"> Un conjunto de programas informáticos<br>
+                <input type="radio" id="q1b" name="q1" value="Los componentes físicos de una computadora"> Los componentes físicos de una computadora<br>
+                <input type="radio" id="q1c" name="q1" value="La parte visible de una computadora"> La parte visible de una computadora
+            </div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCKSGF4Sny9K_-zC7dl96o1eOhmw2nvrpE",
-      authDomain: "examen-c2601.firebaseapp.com",
-      databaseURL: "https://examen-c2601-default-rtdb.firebaseio.com",
-      projectId: "examen-c2601",
-      storageBucket: "examen-c2601.appspot.com",
-      messagingSenderId: "183710876262",
-      appId: "1:183710876262:web:94e1a10c774413e5f0a3a7"
-    };
+            <!-- Pregunta 2 -->
+            <div class="question">
+                <label for="q2">2. ¿Qué es el hardware?</label><br>
+                <input type="radio" id="q2a" name="q2" value="Un conjunto de programas informáticos"> Un conjunto de programas informáticos<br>
+                <input type="radio" id="q2b" name="q2" value="Los componentes físicos de una computadora"> Los componentes físicos de una computadora<br>
+                <input type="radio" id="q2c" name="q2" value="El sistema operativo de la computadora"> El sistema operativo de la computadora
+            </div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+            <!-- Pregunta 3 -->
+            <div class="question">
+                <label for="q3">3. ¿Qué significa "nube" en tecnología?</label><br>
+                <input type="radio" id="q3a" name="q3" value="Almacenamiento y servicios en línea accesibles desde cualquier dispositivo conectado a internet"> Almacenamiento y servicios en línea accesibles desde cualquier dispositivo conectado a internet<br>
+                <input type="radio" id="q3b" name="q3" value="Un sistema operativo"> Un sistema operativo<br>
+                <input type="radio" id="q3c" name="q3" value="Un tipo de computadora portátil"> Un tipo de computadora portátil
+            </div>
 
-    const preguntas = [
-      { texto: "1. ¿Qué es la cultura digital?", opciones: ["Conjunto de conocimientos digitales", "Lenguaje informal", "Solo redes sociales", "Una tribu tecnológica"] },
-      { texto: "2. ¿Cuál es un ejemplo de herramienta digital?", opciones: ["Internet", "Lápiz", "Papel", "Pizarra"] },
-      { texto: "3. ¿Qué significa ser un ciudadano digital responsable?", opciones: ["Usar internet con ética", "Hackear páginas", "Usar redes sin pensar", "Evitar contraseñas"] },
-      { texto: "4. ¿Qué es una red social?", opciones: ["Plataforma para interactuar", "Página de compras", "Enciclopedia", "Programa de TV"] },
-      { texto: "5. ¿Cuál es una buena práctica de seguridad digital?", opciones: ["Usar contraseñas seguras", "Compartir datos", "Abrir correos sospechosos", "Conectarse a WiFi desconocido"] },
-      { texto: "6. ¿Qué es la huella digital?", opciones: ["Rastro que dejas en internet", "Marca de un dedo", "Firma digitalizada", "Nombre de usuario"] },
-      { texto: "7. ¿Qué es el software?", opciones: ["Programas de computadora", "Partes físicas", "Cable de red", "Memoria RAM"] },
-      { texto: "8. ¿Qué es el hardware?", opciones: ["Partes físicas de un equipo", "Programas del sistema", "Base de datos", "Redes sociales"] },
-      { texto: "9. ¿Cuál es una forma de comunicarse digitalmente?", opciones: ["Correo electrónico", "Cartas postales", "Teléfono fijo", "Pintura rupestre"] },
-      { texto: "10. ¿Qué es el phishing?", opciones: ["Engaño para obtener datos", "Navegador web", "Software de seguridad", "Tipo de red"] },
-      { texto: "11. ¿Qué es una URL?", opciones: ["Dirección de una página web", "Lenguaje de programación", "Antivirus", "Base de datos"] },
-      { texto: "12. ¿Qué es una VPN?", opciones: ["Red privada virtual", "Programa de dibujo", "Antivirus", "Red social"] },
-      { texto: "13. ¿Qué se necesita para conectarse a internet?", opciones: ["Módem y proveedor", "Microscopio", "TV", "CD-ROM"] },
-      { texto: "14. ¿Qué es un navegador web?", opciones: ["Programa para ver páginas web", "Base de datos", "Sistema operativo", "Antena"] },
-      { texto: "15. ¿Qué es la nube?", opciones: ["Almacenamiento en internet", "El cielo", "Disco duro", "Correo"] },
-      { texto: "16. ¿Qué es una contraseña segura?", opciones: ["Mezcla de letras, números y símbolos", "1234", "tu nombre", "abc"] },
-      { texto: "17. ¿Qué es el ciberacoso?", opciones: ["Acoso en internet", "Ayuda digital", "Corrección en línea", "Hackeo ético"] },
-      { texto: "18. ¿Qué es un archivo PDF?", opciones: ["Formato de documento", "Foto", "Video", "Página web"] },
-      { texto: "19. ¿Qué es un antivirus?", opciones: ["Programa que detecta amenazas", "Virus de computadora", "PDF seguro", "Red interna"] },
-      { texto: "20. ¿Qué es una IP?", opciones: ["Identificador de una red", "Correo electrónico", "Navegador", "Nombre de usuario"] },
-      { texto: "21. ¿Cuál es el propósito de un sistema operativo?", opciones: ["Gestionar hardware y software", "Enviar correos", "Dibujar", "Tomar fotos"] },
-      { texto: "22. ¿Qué es un archivo comprimido?", opciones: ["Archivo con menos tamaño", "PDF", "Virus", "Foto"] },
-      { texto: "23. ¿Qué significa streaming?", opciones: ["Ver contenido en línea", "Descargar", "Chatear", "Comprimir"] },
-      { texto: "24. ¿Qué es un dominio web?", opciones: ["Nombre de una página", "Red local", "Software", "VPN"] },
-      { texto: "25. ¿Qué significa CC en un correo?", opciones: ["Copia para otro destinatario", "Carpeta compartida", "Correo cancelado", "Copia de CD"] },
-      { texto: "26. ¿Qué es un código QR?", opciones: ["Código escaneable", "Virus", "Correo", "Sitio web"] },
-      { texto: "27. ¿Qué es un blog?", opciones: ["Sitio para publicar textos", "Juego", "Red social", "Antivirus"] },
-      { texto: "28. ¿Qué es la netiqueta?", opciones: ["Normas de comportamiento digital", "Idioma de red", "Usuario falso", "Antivirus"] },
-      { texto: "29. ¿Qué es un foro digital?", opciones: ["Espacio para debatir en línea", "Tienda", "Red física", "Correo"] },
-      { texto: "30. ¿Qué es una actualización de software?", opciones: ["Mejoras al programa", "Virus", "Borrado", "Desinstalación"] }
-    ];
+            <!-- Pregunta 4 -->
+            <div class="question">
+                <label for="q4">4. ¿Qué es un virus informático?</label><br>
+                <input type="radio" id="q4a" name="q4" value="Un programa que se ejecuta sin el conocimiento del usuario y puede dañar o robar información"> Un programa que se ejecuta sin el conocimiento del usuario y puede dañar o robar información<br>
+                <input type="radio" id="q4b" name="q4" value="Una aplicación para gestionar el correo electrónico"> Una aplicación para gestionar el correo electrónico<br>
+                <input type="radio" id="q4c" name="q4" value="Un dispositivo de almacenamiento externo"> Un dispositivo de almacenamiento externo
+            </div>
 
-    window.onload = () => {
-      let nombre = sessionStorage.getItem("nombre");
-      if (!nombre) {
-        nombre = prompt("Ingresa tu nombre:");
-        if (!nombre) {
-          alert("Debes ingresar un nombre.");
-          location.reload();
-        }
-        sessionStorage.setItem("nombre", nombre);
-      }
+            <!-- Pregunta 5 -->
+            <div class="question">
+                <label for="q5">5. ¿Qué es la nube?</label><br>
+                <input type="radio" id="q5a" name="q5" value="Almacenamiento de datos en servidores remotos accesibles por internet"> Almacenamiento de datos en servidores remotos accesibles por internet<br>
+                <input type="radio" id="q5b" name="q5" value="El software de un sistema operativo"> El software de un sistema operativo<br>
+                <input type="radio" id="q5c" name="q5" value="Una forma de almacenar datos en dispositivos locales"> Una forma de almacenar datos en dispositivos locales
+            </div>
 
-      const contenedor = document.getElementById("preguntas");
-      preguntas.forEach((pregunta, index) => {
-        const div = document.createElement("div");
-        div.className = "pregunta";
-        div.innerHTML = `
-          <p><strong>${pregunta.texto}</strong></p>
-          ${pregunta.opciones.map(
-            (op, i) => `
-              <label>
-                <input type="radio" name="p${index}" value="${op}" />
-                ${String.fromCharCode(65 + i)}) ${op}
-              </label><br>`
-          ).join("")}
-        `;
-        contenedor.appendChild(div);
-      });
-    };
+            <!-- Pregunta 6 -->
+            <div class="question">
+                <label for="q6">6. ¿Qué es un firewall?</label><br>
+                <input type="radio" id="q6a" name="q6" value="Un sistema de protección contra virus y accesos no autorizados a la red"> Un sistema de protección contra virus y accesos no autorizados a la red<br>
+                <input type="radio" id="q6b" name="q6" value="Un tipo de computadora portátil"> Un tipo de computadora portátil<br>
+                <input type="radio" id="q6c" name="q6" value="Una herramienta para crear sitios web"> Una herramienta para crear sitios web
+            </div>
 
-    window.enviarExamen = function () {
-      const nombre = sessionStorage.getItem("nombre");
-      const respuestas = {};
-      const preguntas = document.querySelectorAll(".pregunta");
+            <!-- Pregunta 7 -->
+            <div class="question">
+                <label for="q7">7. ¿Qué es un sistema operativo?</label><br>
+                <input type="radio" id="q7a" name="q7" value="El software que permite gestionar el hardware y software de una computadora"> El software que permite gestionar el hardware y software de una computadora<br>
+                <input type="radio" id="q7b" name="q7" value="El hardware de una computadora"> El hardware de una computadora<br>
+                <input type="radio" id="q7c" name="q7" value="Un tipo de virus"> Un tipo de virus
+            </div>
 
-      preguntas.forEach((preguntaDiv, i) => {
-        const seleccionada = preguntaDiv.querySelector("input[type='radio']:checked");
-        respuestas[`pregunta_${i + 1}`] = seleccionada ? seleccionada.value : "Sin respuesta";
-      });
+            <!-- Pregunta 8 -->
+            <div class="question">
+                <label for="q8">8. ¿Qué es el phishing?</label><br>
+                <input type="radio" id="q8a" name="q8" value="Un tipo de ataque informático para robar información personal"> Un tipo de ataque informático para robar información personal<br>
+                <input type="radio" id="q8b" name="q8" value="Una herramienta para analizar el tráfico de internet"> Una herramienta para analizar el tráfico de internet<br>
+                <input type="radio" id="q8c" name="q8" value="Un tipo de software antivirus"> Un tipo de software antivirus
+            </div>
 
-      const datos = {
-        nombre,
-        hora: new Date().toLocaleTimeString(),
-        respuestas
-      };
+            <!-- Pregunta 9 -->
+            <div class="question">
+                <label for="q9">9. ¿Qué es la ciberseguridad?</label><br>
+                <input type="radio" id="q9a" name="q9" value="La protección de sistemas informáticos y redes contra ataques y amenazas"> La protección de sistemas informáticos y redes contra ataques y amenazas<br>
+                <input type="radio" id="q9b" name="q9" value="La programación de software de sistemas operativos"> La programación de software de sistemas operativos<br>
+                <input type="radio" id="q9c" name="q9" value="La gestión de servidores web"> La gestión de servidores web
+            </div>
 
-      const timestamp = Date.now();
-      set(ref(db, `examenes/${nombre}_${timestamp}`), datos)
-        .then(() => {
-          document.getElementById("notificacion").textContent = "✅ Examen enviado correctamente.";
-          document.querySelector("button").disabled = true;
-        })
-        .catch((error) => {
-          document.getElementById("notificacion").textContent = "❌ Error al enviar: " + error.message;
+            <!-- Pregunta 10 -->
+            <div class="question">
+                <label for="q10">10. ¿Qué es la inteligencia artificial?</label><br>
+                <input type="radio" id="q10a" name="q10" value="El campo de la informática que busca crear sistemas capaces de realizar tareas que requieren inteligencia humana"> El campo de la informática que busca crear sistemas capaces de realizar tareas que requieren inteligencia humana<br>
+                <input type="radio" id="q10b" name="q10" value="La programación de aplicaciones web"> La programación de aplicaciones web<br>
+                <input type="radio" id="q10c" name="q10" value="El proceso de análisis de datos"> El proceso de análisis de datos
+            </div>
+
+            <!-- Pregunta 11 -->
+            <div class="question">
+                <label for="q11">11. ¿Qué es el Big Data?</label><br>
+                <input type="radio" id="q11a" name="q11" value="El análisis de grandes volúmenes de datos para extraer información valiosa"> El análisis de grandes volúmenes de datos para extraer información valiosa<br>
+                <input type="radio" id="q11b" name="q11" value="El almacenamiento de información en discos locales"> El almacenamiento de información en discos locales<br>
+                <input type="radio" id="q11c" name="q11" value="La programación de videojuegos"> La programación de videojuegos
+            </div>
+
+            <!-- Pregunta 12 -->
+            <div class="question">
+                <label for="q12">12. ¿Qué son las redes sociales?</label><br>
+                <input type="radio" id="q12a" name="q12" value="Plataformas en línea que permiten la interacción entre personas y el intercambio de información"> Plataformas en línea que permiten la interacción entre personas y el intercambio de información<br>
+                <input type="radio" id="q12b" name="q12" value="Herramientas de análisis de datos"> Herramientas de análisis de datos<br>
+                <input type="radio" id="q12c" name="q12" value="Un tipo de virus informático"> Un tipo de virus informático
+            </div>
+
+            <!-- Continuación hasta pregunta 30 -->
+
+            <button type="submit">Enviar Respuestas</button>
+        </form>
+        
+        <div id="result" class="result">
+            <h2>Resultado:</h2>
+            <p id="score"></p>
+        </div>
+    </main>
+
+    <script>
+        const form = document.getElementById('exam-form');
+        const resultDiv = document.getElementById('result');
+        const scoreText = document.getElementById('score');
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let score = 0;
+            const answers = {
+                q1: 'Un conjunto de programas informáticos',
+                q2: 'Los componentes físicos de una computadora',
+                q3: 'Almacenamiento y servicios en línea accesibles desde cualquier dispositivo conectado a internet',
+                q4: 'Un programa que se ejecuta sin el conocimiento del usuario y puede dañar o robar información',
+                q5: 'Almacenamiento de datos en servidores remotos accesibles por internet',
+                q6: 'Un sistema de protección contra virus y accesos no autorizados a la red',
+                q7: 'El software que permite gestionar el hardware y software de una computadora',
+                q8: 'Un tipo de ataque informático para robar información personal',
+                q9: 'La protección de sistemas informáticos y redes contra ataques y amenazas',
+                q10: 'El campo de la informática que busca crear sistemas capaces de realizar tareas que requieren inteligencia humana',
+                q11: 'El análisis de grandes volúmenes de datos para extraer información valiosa',
+                q12: 'Plataformas en línea que permiten la interacción entre personas y el intercambio de información',
+                q13: 'Una dirección única en internet que identifica un sitio web',
+                q14: 'El proceso de escribir instrucciones que una computadora puede ejecutar',
+                q15: 'El almacenamiento de datos en servidores remotos accesibles por internet',
+                // Continuar agregando respuestas correctas hasta completar las 30
+            };
+
+            for (let [question, correctAnswer] of Object.entries(answers)) {
+                const selectedOption = form.querySelector(`input[name="${question}"]:checked`);
+                if (selectedOption && selectedOption.value === correctAnswer) {
+                    score++;
+                }
+            }
+            
+            resultDiv.style.display = 'block';
+            scoreText.textContent = `Tu puntuación es: ${score} de 30.`;
         });
-    };
-  </script>
+    </script>
 </body>
 </html>
 
